@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--suppress ALL -->
+<hibernate-mapping>
+    <class entity-name="com.task.elements.model.Elements"
+        table="elements" catalog="svaps">
+
+        <id name="id" type="long">
+            <column name="ID" />
+            <generator class="identity" />
+        </id>
+        <property name="folderTitle" type="string">
+            <column name="folderTitle"  not-null="false" />
+        </property>
+        <property name="fileTitle" type="string">
+            <column name="fileTitle" not-null="false" />
+        </property>
+        <property name="parentId" type="long">
+            <column name="parentId" not-null="false" />
+        </property>
+        <property name="textInfa" type="string">
+            <column name="textInfa" not-null="false" />
+        </property>
+        <property name="picture" type="string">
+            <column name="picture" not-null="false" />
+        </property>
+    </class>
+</hibernate-mapping>

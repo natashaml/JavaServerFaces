@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+        >
+<h:head>
+    <h:outputStylesheet library="css" folderTitle="table-style.css"/>
+    <h:outputStylesheet library="css" folderTitle="jquery-ui.css"/>
+
+</h:head>
+
+<h:body>
+
+    <h1>Task</h1>
+    <h:form id="form">
+        <p:dataList value="#{elements.getParentList()}" var="parent"
+                    type="unordered" itemType="none" id="parentList">
+
+            <p:commandLink update=":form:parentList:dlistChildren" title="View Detail Parent" styleClass=""
+                           style="float:left;margin-right:10px">
+                <f:setPropertyActionListener value="#{parent}" target="#{elements.getParentList()}"/>
+                <!--<h:outputText value="#{parent.folderTitle}" />-->
+                <h:commandButton action="#{parent}" image="#{parent.picture}"/>
+            </p:commandLink>
+
+            <h:outputText value="#{parent.folderTitle}" style="display:inline-block"/>
+
+            <p:dataList value="#{elements.getChildList(parent.id)}" var="child"
+                        id="dlistChildren" itemStyleClass="ui-datalist">
+                <h:commandButton action="#{child}" image="#{child.picture}"/>
+
+                <h:outputText value="#{child.folderTitle}" style="display:inline-block"/>
+                <h:outputText value="#{child.fileTitle}" style="display:inline-block"/>
+                <p:dataList value="#{elements.getChildList(child.id)}"
+                            var="node"
+                            id="dlistChildren" itemStyleClass="ui-datalist">
+                    <h:commandButton action="#{node}" image="#{node.picture}"/>
+
+                    <h:outputText value="#{node.folderTitle}" style="display:inline-block"/>
+                    <h:outputText value="#{node.fileTitle}" style="display:inline-block"/>
+                </p:dataList>
+            </p:dataList>
+
+            <p:dialog header="parent Info" widgetVar="parentDialog" modal="true" showEffect="blind" hideEffect="explode"
+                      resizable="false">
+                <p:outputPanel id="parentDetail" rendered="#{not empty elements.getChildList(parent.id)}"
+                               style="text-align:center;">
+                    <p:panelGrid>
+
+                        <h:outputText value="#{elements.getChildList(parent.id)}" style="display:inline-block"/>
+
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+            <!--<p:dialog header="parent Info" widgetVar="parentDialog" modal="true" showEffect="blind" hideEffect="explode" resizable="false">-->
+            <!--<p:outputPanel id="parentDetail" style="text-align:center;">-->
+            <!--<p:panelGrid     >-->
+
+            <!--&lt;!&ndash;<h:outputText value="child" />&ndash;&gt;-->
+            <!--<h:outputText id="display" value="#{elements.getChildList(parent.id)}" />-->
+            <!--<p:dataList value="#{elements.getChildList(parent.id)}" var="child"-->
+            <!--type="unordered" itemType="none"  id="dlistChildren">-->
+            <!--<h:commandButton  action="#{child}"  image="#{child.picture}" />-->
+            <!--<h:outputText value="#{child.folderTitle}" style="display:inline-block"/>-->
+            <!--<h:outputText value="#{child.fileTitle}"  style="display:inline-block"/>-->
+
+            <!--</p:dataList>-->
+            <!--</p:panelGrid>-->
+            <!--</p:outputPanel>-->
+            <!--</p:dialog>-->
+
+        </p:dataList>
+
+
+        <p:dataList value="#{elements.getFileList()}" var="file" type="unordered" itemType="none" id="fileList">
+            <!--<f:facet name="header">-->
+            <!--Paginator-->
+            <!--</f:facet>-->
+            <p:commandLink update=":form:fileList:fileDetail" oncomplete="PF('fileDialog').show()" title="View Detail"
+                           styleClass="" style="float:left;margin-right:10px">
+                <f:setPropertyActionListener value="#{file}" target="#{elements.getFileList()}"/>
+                <!--<h:outputText value="#{file.fileTitle}" />-->
+                <h:commandButton action="#{file}" image="#{file.picture}"/>
+                <!--<h:commandButton   onclick="textClick(#{file.id})"  image="#{file.picture}" />-->
+            </p:commandLink>
+            <!--<f:facet name="description">-->
+            <!--<p:graphicImage name="#{file.picture}"/>-->
+            <!--</f:facet>-->
+            <h:outputText value="#{file.fileTitle}" style="display:inline-block"/>
+            <!--<h:outputText value="#{elements.getTextInfaById(file.id)}" style="display:inline-block"/>-->
+
+            <p:dialog header="file Info" widgetVar="fileDialog" modal="true" showEffect="blind" hideEffect="explode"
+                      resizable="false">
+                <p:outputPanel id="fileDetail" style="text-align:center;">
+                    <p:panelGrid columns="1" rendered="#{not empty elements.getTextInfaById(file.id)}"
+                                 columnClasses="label,value">
+
+                        <h:outputText value="#{rest.getTextInfaById(file.id)}" style="display:inline-block"/>
+
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </p:dataList>
+
+
+    </h:form>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <script type="text/javascript">
+        var idFile;
+        function textClick(id) {
+            idFile = id;
+            textAjaxCall();
+
+        }
+        function textAjaxCall() {
+            $.ajax({
+                url: "/JavaServerFaces/rest/file/test/",
+                type: "GET",
+                data: {
+
+                    "id": idFile
+                },
+                dataType: "json",
+                success: function (data) {
+                    $.each(data, function (i, station) {
+                        station.css({'border-color': '#d8512d'});
+                    });
+                },
+                error: function () {
+
+                }
+            });
+        }
+
+    </script>
+
+
+    <!--<p:spinner />-->
+
+    <!--<h:dataTable value="#{elements.getFileList()}" var="c"-->
+    <!--styleClass="order-table"-->
+    <!--headerClass="order-table-header"-->
+    <!--rowClasses="order-table-odd-row,order-table-even-row"-->
+    <!-->-->
+    <!---->
+    <!--<h:column>-->
+    <!--<f:facet name="header">-->
+    <!--Element ID-->
+    <!--</f:facet>-->
+    <!--#{c.id}-->
+    <!--<p>-->
+    <!--<img src="images/3.jpg" alt="folder" class="leftimg"/>-->
+    <!--</p>-->
+    <!--</h:column>-->
+    <!---->
+    <!--<h:column>-->
+    <!--<f:facet name="header">-->
+    <!--NameFolder-->
+    <!--</f:facet>-->
+    <!--#{c.folderTitle}-->
+    <!--</h:column>-->
+    <!---->
+    <!--<h:column>-->
+    <!--<f:facet name="header">-->
+    <!--NameFile-->
+    <!--</f:facet>-->
+    <!--#{c.fileTitle}-->
+    <!--</h:column>-->
+
+    <!---->
+    <!--</h:dataTable>-->
+
+
+</h:body>
+
+</html>
